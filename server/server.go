@@ -69,7 +69,7 @@ func (s ComposedServer) ResolveDSNConnector(dsn string) *pgdriver.Connector {
 }
 
 func (s ComposedServer) ResolveDBConnector() *pgdriver.Connector {
-	dsn := options.ReadEnv(s.Name(), "DB_DSN", "")
+	dsn := options.ReadEnv(s.Name(), "DSN", "")
 
 	if len(dsn) > 0 {
 		return s.ResolveDSNConnector(dsn)
