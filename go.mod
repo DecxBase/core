@@ -4,6 +4,7 @@ go 1.22.3
 
 require (
 	github.com/gorilla/schema v1.4.1
+	github.com/joho/godotenv v1.5.1
 	github.com/phuslu/log v1.0.111
 	github.com/uptrace/bun v1.2.3
 	github.com/uptrace/bun/dialect/pgdialect v1.2.3

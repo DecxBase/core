@@ -1,26 +1,27 @@
 package types
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/phuslu/log"
 	"google.golang.org/grpc"
 )
 
-type ServiceHandlerFunc = func(http.ResponseWriter, *http.Request) ServiceHandlerResult
+type HTTPHandler = func(w http.ResponseWriter, r *http.Request) (any, error)
 
-type SeviceHandlerResultFunc = func() ServiceHandlerResult
+type HandlerResultFunc = func() HandlerResult
 
-type ServiceHandlerResult int
+type HandlerResult int
 
 const (
-	ServiceOk      ServiceHandlerResult = iota + 1 // EnumIndex = 1
-	ServiceErr                                     // EnumIndex = 2
-	ServiceFailed                                  // EnumIndex = 3
-	ServiceInvalid                                 // EnumIndex = 4
+	ServiceOk      HandlerResult = iota + 1 // EnumIndex = 1
+	ServiceErr                              // EnumIndex = 2
+	ServiceFailed                           // EnumIndex = 3
+	ServiceInvalid                          // EnumIndex = 4
 )
 
-func (r ServiceHandlerResult) String() string {
+func (r HandlerResult) String() string {
 	return []string{"ok", "err", "failed", "invalid"}[r-1]
 }
 
@@ -34,4 +35,18 @@ type HttpHandler interface {
 	HttpIdentifier() string
 	RegisterRoutes(*http.ServeMux) error
 	SetLogger(log.Logger)
+}
+
+type HandlerService[K, L, M, N any] interface {
+	FindRecords(context.Context, K) (any, error)
+	FindRecord(context.Context, L) (any, error)
+	SaveRecord(context.Context, bool, M) error
+	DeleteRecord(context.Context, N) error
+}
+
+type HttpHandlerImpl[K, L, M, N any] interface {
+	FindRecords(context.Context, K) (any, error)
+	FindRecord(context.Context, L) (any, error)
+	SaveRecord(context.Context, bool, M) error
+	DeleteRecord(context.Context, N) error
 }

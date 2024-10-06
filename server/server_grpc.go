@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-func (s composedServer) BuildGrpc(l log.Logger) (*grpc.Server, error) {
+func (s ComposedServer) BuildGrpc(l log.Logger) (*grpc.Server, error) {
 	srv := grpc.NewServer()
 
 	for _, hnd := range s.grpcHandlers {
@@ -20,7 +20,7 @@ func (s composedServer) BuildGrpc(l log.Logger) (*grpc.Server, error) {
 	return srv, nil
 }
 
-func (s composedServer) RunGrpc(closers ...func()) error {
+func (s ComposedServer) RunGrpc(closers ...func()) error {
 	if len(s.grpcHandlers) < 1 {
 		return errors.New("no grpc handlers registered")
 	}

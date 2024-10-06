@@ -5,11 +5,10 @@ import (
 	"net/http"
 
 	"github.com/DecxBase/core/logger"
-	"github.com/DecxBase/core/utils"
 	"github.com/phuslu/log"
 )
 
-func (s composedServer) BuildHttp(l log.Logger) (*http.ServeMux, error) {
+func (s ComposedServer) BuildHttp(l log.Logger) (*http.ServeMux, error) {
 	router := http.NewServeMux()
 
 	for _, hnd := range s.httpHandlers {
@@ -17,14 +16,10 @@ func (s composedServer) BuildHttp(l log.Logger) (*http.ServeMux, error) {
 		hnd.RegisterRoutes(router)
 	}
 
-	router.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
-		utils.WriteError(w, http.StatusNotFound, errors.New("api endpoint not found"))
-	})
-
 	return router, nil
 }
 
-func (s composedServer) RunHttp(closers ...func()) error {
+func (s ComposedServer) RunHttp(closers ...func()) error {
 	if len(s.httpHandlers) < 1 {
 		return errors.New("no http handlers registered")
 	}
@@ -44,7 +39,6 @@ func (s composedServer) RunHttp(closers ...func()) error {
 
 		Addr:    s.opts.HttpAddr(),
 		Handler: router,
-		// Handler: http.TimeoutHandler(router, s.opts.HandlerTimeout, "Timeout\n"),
 	}
 
 	errC, err := GracefulHttp(srv, l)

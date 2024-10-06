@@ -10,23 +10,24 @@ import (
 
 var decoder = schema.NewDecoder()
 
-func WriteJSON(w http.ResponseWriter, status int, v any) error {
+func WriteResponseJSON(w http.ResponseWriter, status int, v any) error {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
 	return json.NewEncoder(w).Encode(v)
 }
 
-func WriteError(w http.ResponseWriter, status int, err error) {
-	WriteJSON(w, status, map[string]string{"error": err.Error()})
+func WriteResponseError(w http.ResponseWriter, status int, err error) {
+	WriteResponseJSON(w, status, map[string]any{
+		"error": err.Error(),
+	})
 }
 
-func ParseQuery(r *http.Request, v any) error {
-	err := decoder.Decode(v, r.URL.Query())
-	if err != nil {
-		return err
-	}
+func WriteResponseData(w http.ResponseWriter, v any) {
+	WriteResponseJSON(w, http.StatusOK, v)
+}
 
-	return nil
+func ParseQuery(r *http.Request, obj any) error {
+	return decoder.Decode(obj, r.URL.Query())
 }
 
 func ParseBody(r *http.Request, v any) error {

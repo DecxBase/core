@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"runtime"
 
@@ -12,17 +13,23 @@ import (
 	"github.com/uptrace/bun/extra/bundebug"
 )
 
-func GetDB(connector *pgdriver.Connector) *bun.DB {
+func GetSqlDB(connector driver.Connector) *sql.DB {
 	maxOpenConns := 4 * runtime.GOMAXPROCS(0)
 
-	sqldb := sql.OpenDB(connector)
-	sqldb.SetMaxOpenConns(maxOpenConns)
-	sqldb.SetMaxIdleConns(maxOpenConns)
+	db := sql.OpenDB(connector)
+	db.SetMaxOpenConns(maxOpenConns)
+	db.SetMaxIdleConns(maxOpenConns)
 
-	err := sqldb.Ping()
+	err := db.Ping()
 	if err != nil {
 		panic(fmt.Sprintf("Failed to connect to database: %s", err))
 	}
+
+	return db
+}
+
+func GetBunDB(connector driver.Connector) *bun.DB {
+	sqldb := GetSqlDB(connector)
 
 	db := bun.NewDB(
 		sqldb, pgdialect.New(),

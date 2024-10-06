@@ -60,12 +60,6 @@ func WithIdleTimeout(t time.Duration) types.ServerOptionsFunc {
 	}
 }
 
-func WithHandlerTimeout(t time.Duration) types.ServerOptionsFunc {
-	return func(o *types.ServerOptions) {
-		o.HandlerTimeout = t
-	}
-}
-
 func WithReadHeaderTimeout(t time.Duration) types.ServerOptionsFunc {
 	return func(o *types.ServerOptions) {
 		o.ReadHeaderTimeout = t

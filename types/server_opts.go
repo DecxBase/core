@@ -16,7 +16,6 @@ type ServerOptions struct {
 	ReadTimeout       time.Duration
 	WriteTimeout      time.Duration
 	IdleTimeout       time.Duration
-	HandlerTimeout    time.Duration
 	ReadHeaderTimeout time.Duration
 }
 
@@ -39,11 +38,10 @@ func DefaultServerOptions() ServerOptions {
 		UseSSL:      false,
 		ReflectGRPC: true,
 
-		// ReadTimeout:       1 * time.Second,
-		// WriteTimeout:      1 * time.Second,
-		// IdleTimeout:       30 * time.Second,
-		// HandlerTimeout:    5 * time.Second,
-		// ReadHeaderTimeout: 2 * time.Second,
+		ReadTimeout:       5 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       30 * time.Second,
+		ReadHeaderTimeout: 2 * time.Second,
 	}
 }
 

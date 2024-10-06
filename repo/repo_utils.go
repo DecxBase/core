@@ -1,4 +1,4 @@
-package db
+package repo
 
 import (
 	"encoding/json"
@@ -32,12 +32,17 @@ func (r *DataRepository[P, M]) WithDB(db *bun.DB) *DataRepository[P, M] {
 	return r
 }
 
-func (r *DataRepository[P, M]) WithFilters(filters ...*QueryFilters) *DataRepository[P, M] {
+func (r *DataRepository[P, M]) WithFilters(filters ...*DataFilters) *DataRepository[P, M] {
 	r.activeFilters = filters
 	return r
 }
 
-func (r *DataRepository[P, M]) AddFilter(filter *QueryFilters) *DataRepository[P, M] {
+func (r *DataRepository[P, M]) KeepFilters() *DataRepository[P, M] {
+	r.keepFilters = true
+	return r
+}
+
+func (r *DataRepository[P, M]) AddFilter(filter *DataFilters) *DataRepository[P, M] {
 	r.activeFilters = append(r.activeFilters, filter)
 	return r
 }
@@ -59,7 +64,11 @@ func (r *DataRepository[P, M]) ApplyBuilder(query bun.QueryBuilder) bun.QueryBui
 		}
 	}
 
-	r.activeFilters = make([]*QueryFilters, 0)
+	if r.keepFilters {
+		r.keepFilters = false
+	} else {
+		r.activeFilters = make([]*DataFilters, 0)
+	}
 
 	return query
 }
