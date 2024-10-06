@@ -64,10 +64,22 @@ func (s ComposedServer) Run(closers ...func()) error {
 	return errors.New("no grpc/http handlers registered")
 }
 
+func (s ComposedServer) ResolveDSNConnector(dsn string) *pgdriver.Connector {
+	return db.NewPGConnector(dsn)
+}
+
 func (s ComposedServer) ResolveDBConnector() *pgdriver.Connector {
-	return db.NewPGConnector(fmt.Sprintf("postgres://%s:%s@localhost:%d/%s?sslmode=%s",
+	dsn := options.ReadEnv(s.Name(), "DB_DSN", "")
+
+	if len(dsn) > 0 {
+		return s.ResolveDSNConnector(dsn)
+	}
+
+	return s.ResolveDSNConnector(fmt.Sprintf("%s://%s:%s@%s:%d/%s?sslmode=%s",
+		options.ReadEnv(s.Name(), "db_protocol", "postgres"),
 		options.ReadEnv(s.Name(), "db_user", "postgres"),
 		options.ReadEnv(s.Name(), "db_pass", ""),
+		options.ReadEnv(s.Name(), "db_host", "localhost"),
 		options.ReadEnv(s.Name(), "db_port", 5432),
 		options.ReadEnv(s.Name(), "db_name", ""),
 		options.ReadEnv(s.Name(), "db_ssl_mode", "disable"),
