@@ -1,7 +1,6 @@
 package db
 
 import (
-	"context"
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
@@ -45,32 +44,4 @@ func GetBunDB(connector driver.Connector) *bun.DB {
 
 func NewPGConnector(dsn string) *pgdriver.Connector {
 	return pgdriver.NewConnector(pgdriver.WithDSN(dsn))
-}
-
-// CreateSchema creates database schema
-//
-//	[]interface{}{
-//		(*model.Category)(nil),
-//	}
-func CreateSchema(ctx context.Context, db *bun.DB, models []interface{}) error {
-	for _, model := range models {
-		_, err := db.NewCreateTable().Model(model).Exec(ctx)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// DropSchema removes database schema
-func DropSchema(ctx context.Context, db *bun.DB, models []interface{}) error {
-	for _, model := range models {
-		_, err := db.NewDropTable().Model(model).Exec(ctx)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

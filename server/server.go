@@ -24,7 +24,7 @@ type ComposedServer struct {
 
 func Create(fns ...types.ServerOptionsFunc) *ComposedServer {
 	opts := types.NewServerOptions(fns...)
-	godotenv.Load(".env", "local.env")
+	godotenv.Load("local.env")
 
 	server := &ComposedServer{
 		opts:         opts,
