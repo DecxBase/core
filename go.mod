@@ -1,6 +1,6 @@
 module github.com/DecxBase/core
 
-go 1.22.3
+go 1.23.3
 
 require (
 	github.com/gorilla/schema v1.4.1
