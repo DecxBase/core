@@ -5,11 +5,27 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/DecxBase/core/types"
 )
 
-func ReadEnv[T string | int | bool](prefix string, key string, def T) T {
-	val, ok := os.LookupEnv(strings.ToUpper(fmt.Sprintf("%s_%s", prefix, key)))
+func ReadEnvs(keys ...string) types.JSONStringData {
+	data := make(types.JSONStringData)
 
+	for _, key := range keys {
+		data[key] = ReadEnv[string]("", key, "")
+	}
+
+	return data
+}
+
+func ReadEnv[T string | int | bool](prefix string, key string, def T) T {
+	theKey := key
+	if len(prefix) > 0 {
+		theKey = fmt.Sprintf("%s_%s", prefix, key)
+	}
+
+	val, ok := os.LookupEnv(strings.ToUpper(theKey))
 	if !ok {
 		return def
 	}

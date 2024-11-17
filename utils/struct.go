@@ -3,10 +3,12 @@ package utils
 import (
 	"encoding/json"
 	"net/url"
+
+	"github.com/DecxBase/core/types"
 )
 
-func QueryToMap(source url.Values) map[string]string {
-	values := make(map[string]string)
+func QueryToMap(source url.Values) types.JSONStringData {
+	values := make(types.JSONStringData)
 
 	for key := range source {
 		values[key] = source.Get(key)
@@ -37,8 +39,8 @@ func MapToStruct(source map[string]any, obj any) error {
 	return nil
 }
 
-func StructToMap(obj interface{}) (map[string]interface{}, error) {
-	var result map[string]interface{}
+func StructToMap(obj interface{}) (types.JSONDumpData, error) {
+	var result types.JSONDumpData
 
 	jsonBytes, err := DataToBytes(obj)
 	if err != nil {
