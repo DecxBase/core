@@ -58,9 +58,9 @@ func (h Handler) HTTPHandler(handler types.HTTPHandler) http.HandlerFunc {
 			res, rErr := handler(w, r)
 
 			if rErr != nil {
-				err := rErr.(*exception.ServerException)
+				err, ok := rErr.(*exception.ServerException)
 
-				if err != nil {
+				if ok {
 					err.WriteToResponse(w)
 
 					if err.StatusCode == http.StatusInternalServerError {
@@ -75,7 +75,9 @@ func (h Handler) HTTPHandler(handler types.HTTPHandler) http.HandlerFunc {
 				return types.ServiceFailed
 			}
 
-			utils.WriteResponseData(w, res)
+			if res != nil {
+				utils.WriteResponseData(w, res)
+			}
 			return types.ServiceOk
 		})
 	}

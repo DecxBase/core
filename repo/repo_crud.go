@@ -28,9 +28,8 @@ func (r DataRepository[P, M]) FindAll(ctx context.Context, data *types.RepoSchem
 		return nil, err
 	}
 
-	err = r.ResolveSchemaPaginate(r.getDB().NewSelect().Model(r.CreateModels()), data).
-		ApplyQueryBuilder(r.ApplyBuilder).
-		Scan(ctx, records)
+	err = r.ApplySelectBuilder(r.ResolveSchemaPaginate(r.getDB().NewSelect().Model(r.CreateModels()), data)).
+		ApplyQueryBuilder(r.ApplyBuilder).Scan(ctx, records)
 
 	if err != nil {
 		return nil, err
@@ -63,9 +62,8 @@ func (r DataRepository[P, M]) FindAll(ctx context.Context, data *types.RepoSchem
 }
 
 func (r DataRepository[P, M]) Find(ctx context.Context, record *P) error {
-	return r.getDB().NewSelect().Model(r.CreateModel()).
-		ApplyQueryBuilder(r.ApplyBuilder).Limit(1).
-		Scan(ctx, record)
+	return r.ApplySelectBuilder(r.getDB().NewSelect().Model(r.CreateModel())).
+		ApplyQueryBuilder(r.ApplyBuilder).Limit(1).Scan(ctx, record)
 }
 
 func (r DataRepository[P, M]) Insert(ctx context.Context, record *P) (sql.Result, error) {

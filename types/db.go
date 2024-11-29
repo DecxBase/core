@@ -7,10 +7,11 @@ const (
 	DataFilterWherePK                                  // EnumIndex = 2
 	DataFilterWhereLike                                // EnumIndex = 3
 	DataFilterFunc                                     // EnumIndex = 4
+	DataFilterRelation                                 // EnumIndex = 5
 )
 
 func (r DataFilterCondition) String() string {
-	return []string{"where", "pk", "like", "func"}[r-1]
+	return []string{"where", "pk", "like", "func", "relation"}[r-1]
 }
 
 type ServiceActionType int

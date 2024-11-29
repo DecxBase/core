@@ -73,6 +73,16 @@ func (r *DataRepository[P, M]) ApplyBuilder(query bun.QueryBuilder) bun.QueryBui
 	return query
 }
 
+func (r *DataRepository[P, M]) ApplySelectBuilder(query *bun.SelectQuery) *bun.SelectQuery {
+	if len(r.activeFilters) > 0 {
+		for _, filter := range r.activeFilters {
+			query = filter.ApplySelectBuilder(query)
+		}
+	}
+
+	return query
+}
+
 func (r DataRepository[P, M]) CreateProto() *P {
 	var zero *P
 	tp := reflect.TypeOf(zero).Elem()

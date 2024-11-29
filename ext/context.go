@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/DecxBase/core/types"
 	"github.com/DecxBase/core/utils"
 )
 
@@ -27,6 +28,10 @@ func (c HTTPEndpointContext) FromQuery(target any) error {
 
 func (c HTTPEndpointContext) FromBody(target any) error {
 	return utils.ParseBody(c.Request, target)
+}
+
+func (c HTTPEndpointContext) FromValues(values types.JSONDumpData, target any) error {
+	return utils.MapToStruct(values, target)
 }
 
 func (c HTTPEndpointContext) PathValue(name string) string {

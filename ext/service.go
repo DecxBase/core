@@ -28,10 +28,10 @@ func NewService[P any, M types.ModelForService](
 	}
 }
 
-func (s *Service[P, M]) FindRecords(ctx context.Context, req any) ([]*P, *repo.RecordsPagingData, error) {
+func (s *Service[P, M]) FindRecords(ctx context.Context, req any, filters ...*repo.DataFilters) ([]*P, *repo.RecordsPagingData, error) {
 	var records []*P
 	data := s.Repo.ResolveSchemaData(types.ServiceActionFindAll, req)
-	filter := s.Repo.ResolveSchemaFilter(types.ServiceActionFindAll, data)
+	filter := s.Repo.ResolveSchemaFilter(types.ServiceActionFindAll, data).Merge(filters...)
 	paging, err := s.Repo.WithFilters(filter).FindAll(ctx, data, &records)
 
 	if err != nil {
@@ -41,12 +41,12 @@ func (s *Service[P, M]) FindRecords(ctx context.Context, req any) ([]*P, *repo.R
 	return records, paging, nil
 }
 
-func (s *Service[P, M]) FindRecord(ctx context.Context, req any) (*P, error) {
+func (s *Service[P, M]) FindRecord(ctx context.Context, req any, filters ...*repo.DataFilters) (*P, error) {
 	record := new(P)
 	data := s.Repo.ResolveSchemaData(types.ServiceActionFind, req)
 
 	err := s.Repo.WithFilters(
-		s.Repo.ResolveSchemaFilter(types.ServiceActionFind, data),
+		s.Repo.ResolveSchemaFilter(types.ServiceActionFind, data).Merge(filters...),
 	).Find(ctx, record)
 
 	if err != nil {
@@ -73,11 +73,11 @@ func (s *Service[P, M]) SaveRecord(ctx context.Context, create bool, record *P) 
 	return err
 }
 
-func (s *Service[P, M]) DeleteRecord(ctx context.Context, req any) error {
+func (s *Service[P, M]) DeleteRecord(ctx context.Context, req any, filters ...*repo.DataFilters) error {
 	data := s.Repo.ResolveSchemaData(types.ServiceActionDelete, req)
 
 	_, err := s.Repo.WithFilters(
-		s.Repo.ResolveSchemaFilter(types.ServiceActionDelete, data),
+		s.Repo.ResolveSchemaFilter(types.ServiceActionDelete, data).Merge(filters...),
 	).Delete(ctx)
 
 	if err != nil {

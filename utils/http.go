@@ -2,7 +2,7 @@ package utils
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/schema"
@@ -32,7 +32,7 @@ func ParseQuery(r *http.Request, obj any) error {
 
 func ParseBody(r *http.Request, v any) error {
 	if r.Body == nil {
-		return fmt.Errorf("missing request body")
+		return errors.New("missing request body")
 	}
 
 	return json.NewDecoder(r.Body).Decode(v)

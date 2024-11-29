@@ -1,10 +1,5 @@
 package ext
 
-import (
-	"fmt"
-	"strings"
-)
-
 type CrudHTTPListHandler interface {
 	FindRecords(ctx HTTPEndpointContext) (any, error)
 }
@@ -23,21 +18,11 @@ type CrudHTTPDeleteHandler interface {
 
 type CrudHTTPHandler struct {
 	HTTPHandler
-	Prefix string
-}
-
-func (h CrudHTTPHandler) MakePath(path ...string) string {
-	paths := []string{"/" + h.Prefix}
-	if len(path) > 0 {
-		paths = append(paths, path...)
-	}
-
-	return strings.Join(paths, "/")
 }
 
 func (h *CrudHTTPHandler) RegisterList(hn CrudHTTPListHandler) *CrudHTTPHandler {
 	h.WithEndpoint(
-		HTTPEndpoint(fmt.Sprintf("GET %s", h.MakePath()), hn.FindRecords),
+		HTTPEndpoint(h.MakePattern("GET"), hn.FindRecords),
 	)
 
 	return h
@@ -45,7 +30,7 @@ func (h *CrudHTTPHandler) RegisterList(hn CrudHTTPListHandler) *CrudHTTPHandler 
 
 func (h *CrudHTTPHandler) RegisterFind(hn CrudHTTPFindHandler) *CrudHTTPHandler {
 	h.WithEndpoint(
-		HTTPEndpoint(fmt.Sprintf("GET %s", h.MakePath("{id}")), hn.FindRecord),
+		HTTPEndpoint(h.MakePattern("GET", "{id}"), hn.FindRecord),
 	)
 
 	return h
@@ -53,8 +38,8 @@ func (h *CrudHTTPHandler) RegisterFind(hn CrudHTTPFindHandler) *CrudHTTPHandler 
 
 func (h *CrudHTTPHandler) RegisterSave(hn CrudHTTPSaveHandler) *CrudHTTPHandler {
 	h.WithEndpoint(
-		HTTPEndpoint(fmt.Sprintf("POST %s", h.MakePath()), hn.SaveRecord),
-		HTTPEndpoint(fmt.Sprintf("PATCH %s", h.MakePath("{id}")), hn.SaveRecord),
+		HTTPEndpoint(h.MakePattern("POST", "{id}"), hn.SaveRecord),
+		HTTPEndpoint(h.MakePattern("PATCH", "{id}"), hn.SaveRecord),
 	)
 
 	return h
@@ -62,7 +47,7 @@ func (h *CrudHTTPHandler) RegisterSave(hn CrudHTTPSaveHandler) *CrudHTTPHandler 
 
 func (h *CrudHTTPHandler) RegisterDelete(hn CrudHTTPDeleteHandler) *CrudHTTPHandler {
 	h.WithEndpoint(
-		HTTPEndpoint(fmt.Sprintf("DELETE %s", h.MakePath("{id}")), hn.DeleteRecord),
+		HTTPEndpoint(h.MakePattern("DELETE", "{id}"), hn.DeleteRecord),
 	)
 
 	return h
@@ -70,7 +55,6 @@ func (h *CrudHTTPHandler) RegisterDelete(hn CrudHTTPDeleteHandler) *CrudHTTPHand
 
 func NewCrudHTTPHandler(prefix string) CrudHTTPHandler {
 	return CrudHTTPHandler{
-		Prefix:      prefix,
-		HTTPHandler: NewHTTPHandler(),
+		HTTPHandler: NewHTTPHandler(prefix),
 	}
 }
