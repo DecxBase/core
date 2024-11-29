@@ -7,15 +7,13 @@ import (
 	"runtime"
 
 	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
 	"github.com/uptrace/bun/extra/bundebug"
+	"github.com/uptrace/bun/schema"
 )
 
-func GetSqlDB(connector driver.Connector) *sql.DB {
+func PrepareSqlDB(db *sql.DB) *sql.DB {
 	maxOpenConns := 4 * runtime.GOMAXPROCS(0)
 
-	db := sql.OpenDB(connector)
 	db.SetMaxOpenConns(maxOpenConns)
 	db.SetMaxIdleConns(maxOpenConns)
 
@@ -27,11 +25,13 @@ func GetSqlDB(connector driver.Connector) *sql.DB {
 	return db
 }
 
-func GetBunDB(connector driver.Connector) *bun.DB {
-	sqldb := GetSqlDB(connector)
+func GetSqlDB(connector driver.Connector) *sql.DB {
+	return PrepareSqlDB(OpenDB(connector))
+}
 
+func Transform(sqldb *sql.DB, dialect schema.Dialect) *bun.DB {
 	db := bun.NewDB(
-		sqldb, pgdialect.New(),
+		sqldb, dialect,
 		bun.WithDiscardUnknownColumns(),
 	)
 	db.AddQueryHook(bundebug.NewQueryHook(
@@ -42,6 +42,14 @@ func GetBunDB(connector driver.Connector) *bun.DB {
 	return db
 }
 
-func NewPGConnector(dsn string) *pgdriver.Connector {
-	return pgdriver.NewConnector(pgdriver.WithDSN(dsn))
+func TransformConnector(connector driver.Connector, dialect schema.Dialect) *bun.DB {
+	return Transform(GetSqlDB(connector), dialect)
+}
+
+func Open(driver string, dsn string) (*sql.DB, error) {
+	return sql.Open(driver, dsn)
+}
+
+func OpenDB(connector driver.Connector) *sql.DB {
+	return sql.OpenDB(connector)
 }

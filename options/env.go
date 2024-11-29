@@ -13,7 +13,7 @@ func ReadEnvs(keys ...string) types.JSONStringData {
 	data := make(types.JSONStringData)
 
 	for _, key := range keys {
-		data[key] = ReadEnv[string]("", key, "")
+		data[key] = ReadEnv("", key, "")
 	}
 
 	return data
